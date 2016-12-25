@@ -3,20 +3,20 @@ package ah.advert.service.advert
 import java.time.LocalDate
 
 import ah.advert.BaseTestRoutes
-import ah.advert.entity.{Advert, FuelEnum}
+import ah.advert.entity.Advert
+import ah.advert.entity.FuelEnum._
 import ah.advert.json.JsonProtocol._
 import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
-import ah.advert.entity.FuelEnum._
 
 class AdvertRoutesSpec extends BaseTestRoutes {
 
-  val path = "/advert"
+  val testPath = "/advert"
 
-  it should "get latest projects" in {
+  it should "get empty adverts" in {
     val authHeader: Authorization = getAuthHeader
 
-    Get("/project") ~> authHeader ~> advertRoutes.routes ~> check {
+    Get(testPath) ~> authHeader ~> advertRoutes.routes ~> check {
       responseAs[Seq[Advert]] shouldEqual Seq.empty[Advert]
     }
   }
@@ -25,20 +25,17 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     val authHeader: Authorization = getAuthHeader
 
     val advert1 = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.now))
-    val post: HttpRequest = Post(path, advert1)
+    val post: HttpRequest = Post(testPath, advert1)
 
-    post ~> advertRoutes.routes ~> check {
+    post ~> authHeader ~> advertRoutes.routes ~> check {
       status === StatusCodes.Created
       responseAs[String] should not be empty
     }
 
-    Get(path) ~> authHeader ~> advertRoutes.routes ~> check {
+    Get(testPath) ~> authHeader ~> advertRoutes.routes ~> check {
       val str = responseAs[String]
       val adverts = responseAs[Seq[Advert]]
       adverts should not be empty
     }
-
   }
-
-
 }
