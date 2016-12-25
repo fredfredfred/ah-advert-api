@@ -5,7 +5,6 @@ package ah.advert.entity
   */
 object FuelEnum extends Enumeration {
   type FuelEnum = Value
-  val DIESEL = Value("DIESEL")
-  val GASOLINE = Value("GASOLINE")
+  val DIESEL, GASOLINE = Value
 }
 
