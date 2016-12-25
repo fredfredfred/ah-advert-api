@@ -1,4 +1,4 @@
-package ah.tracknbill.entity
+package ah.advert.entity
 
 /**
   * Created by ansgar on 2016-12-24.

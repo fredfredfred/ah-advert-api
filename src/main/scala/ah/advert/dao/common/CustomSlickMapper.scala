@@ -1,10 +1,10 @@
-package ah.tracknbill.dao.common
+package ah.advert.dao.common
 
 import java.sql.{Date, Timestamp}
 import java.time.{LocalDate, LocalDateTime}
 
-import ah.tracknbill.entity.FuelEnum
-import ah.tracknbill.entity.FuelEnum.FuelEnum
+import ah.advert.entity.FuelEnum
+import ah.advert.entity.FuelEnum.FuelEnum
 import slick.ast.BaseTypedType
 import slick.driver.PostgresDriver
 import slick.driver.PostgresDriver.api._

@@ -1,7 +1,7 @@
-package ah.tracknbill.dao
+package ah.advert.dao
 
-import ah.tracknbill.dao.common.{BaseDao, BaseDaoImpl}
-import ah.tracknbill.entity.{Advert, AdvertTable}
+import ah.advert.dao.common.{BaseDao, BaseDaoImpl}
+import ah.advert.entity.{Advert, AdvertTable}
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcProfile
 import slick.lifted.TableQuery

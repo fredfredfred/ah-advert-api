@@ -1,10 +1,10 @@
-package ah.tracknbill.entity
+package ah.advert.entity
 
 import java.time.LocalDate
 
-import ah.tracknbill.dao.common.CustomSlickMapper.Postgres._
-import ah.tracknbill.entity.FuelEnum.FuelEnum
-import ah.tracknbill.entity.common.{BaseEntity, BaseTable}
+import ah.advert.dao.common.CustomSlickMapper.Postgres._
+import ah.advert.entity.FuelEnum.FuelEnum
+import ah.advert.entity.common.{BaseEntity, BaseTable}
 import slick.driver.PostgresDriver.api._
 import slick.lifted.Tag
 

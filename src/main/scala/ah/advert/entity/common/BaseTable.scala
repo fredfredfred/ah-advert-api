@@ -1,4 +1,4 @@
-package ah.tracknbill.entity.common
+package ah.advert.entity.common
 
 import slick.driver.PostgresDriver.api._
 import slick.lifted.Tag

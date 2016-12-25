@@ -1,6 +1,6 @@
-package ah.tracknbill.dao.common
+package ah.advert.dao.common
 
-import ah.tracknbill.entity.common.{BaseEntity, BaseTable}
+import ah.advert.entity.common.{BaseEntity, BaseTable}
 import slick.backend.DatabaseConfig
 import slick.dbio.Effect.Read
 import slick.driver.JdbcProfile
@@ -10,7 +10,7 @@ import slick.lifted.CanBeQueryCondition
 import slick.profile.FixedSqlStreamingAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Awaitable, Future}
+import scala.concurrent.Future
 
 trait BaseDao[T, A] {
   def count(): Future[Int]
