@@ -12,8 +12,6 @@ import akka.http.scaladsl.server.Route
 import ch.megard.akka.http.cors.CorsDirectives._
 import com.softwaremill.macwire._
 import com.softwaremill.session.RefreshTokenStorage
-import com.softwaremill.session.SessionDirectives._
-import com.softwaremill.session.SessionOptions._
 import org.slf4j.LoggerFactory
 import spray.json.DefaultJsonProtocol
 
@@ -28,61 +26,98 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
 
   implicit lazy val refreshTokenStorage: RefreshTokenStorage[SessionData] = wire[RefreshTokenStorageImpl]
 
-  val allAdverts: Route =
+
+  def createOrUpdateAdvert(advertId: Long, advert: Advert) = {
+    if (advertId != advert.id) {
+      complete(BadRequest, s"ids of request and data do not match: request id=${advertId} data id=${advert.id}")
+    }
+    onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
+      case Success(advertOption) => advertOption match {
+        case Some(foundAdvert) => updateAdvert(advert)
+        case None => createAdvert(advert)
+      }
+      case Failure(ex) => {
+        logger.error(s"Error updating advert with id=$advertId", ex)
+        complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+      }
+    }
+  }
+
+  def updateAdvert(advert: Advert) = onComplete(advertService.update(advert).mapTo[Int]) {
+    case Success(id) => complete(NoContent) // http 204
+    case Failure(ex) => {
+      logger.error(s"Error updating advert with id=${advert.id}", ex)
+      complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+    }
+  }
+
+  def createAdvert(advert: Advert): Route = onComplete(advertService.insert(advert)) {
+    case Success(id) => {
+      complete(Created -> id.toString)
+    }
+    case Failure(ex) => {
+      logger.error(s"Error posting advert $advert", ex)
+      complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+    }
+  }
+
+
+  val allAdvertsRoute: Route =
     cors() {
       path(basePath) {
         get {
-          requiredSession(oneOff, usingHeaders) { session =>
-            onComplete(advertService.findAll().mapTo[Seq[Advert]]) {
-              case Success(advertList) => complete(advertList)
-              case Failure(ex) => {
-                logger.error("Error requesting latest adverts", ex)
-                complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
-              }
+          onComplete(advertService.findAll().mapTo[Seq[Advert]]) {
+            case Success(advertList) => complete(advertList)
+            case Failure(ex) => {
+              logger.error("Error requesting latest adverts", ex)
+              complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
             }
           }
         }
       }
     }
-  val getAdvert =
+
+  val getAdvertRoute =
     cors() {
       path(basePath / LongNumber) { (advertId) =>
         get {
-          requiredSession(oneOff, usingHeaders) { session =>
-            onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
-              case Success(advertOption) => advertOption match {
-                case Some(advert) => complete(advert)
-                case None => complete(NotFound, s"The supplier doesn't exist")
-              }
-              case Failure(ex) => {
-                logger.error(s"Error requesting advert with id=$advertId", ex)
-                complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
-              }
+          onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
+            case Success(advertOption) => advertOption match {
+              case Some(advert) => complete(advert)
+              case None => complete(NotFound, s"The supplier doesn't exist")
+            }
+            case Failure(ex) => {
+              logger.error(s"Error requesting advert with id=$advertId", ex)
+              complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
             }
           }
         }
       }
     }
 
-  val postAdvert =
+  val createAdvertRoute =
     cors() {
       path(basePath) {
         post {
-          entity(as[Advert]) { advert =>
-            requiredSession(oneOff, usingHeaders) { session =>
-              onComplete(advertService.insert(advert)) {
-                case Success(id) => complete(Created -> id.toString)
-                case Failure(ex) => {
-                  logger.error(s"Error posting advert $advert", ex)
-                  complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
-                }
-              }
-            }
+          entity(as[Advert]) {
+            advert => createAdvert(advert)
           }
         }
       }
     }
 
-  val routes: Route = allAdverts ~ getAdvert ~ postAdvert
+  val updateAdvertRoute =
+    cors() {
+      path(basePath / LongNumber) { (advertId) =>
+        put {
+          entity(as[Advert]) { advert => createOrUpdateAdvert(advertId, advert)
+          }
+        }
+      }
+    }
+
+
+  val routes: Route = allAdvertsRoute ~ getAdvertRoute ~ createAdvertRoute ~ updateAdvertRoute
+
 
 }

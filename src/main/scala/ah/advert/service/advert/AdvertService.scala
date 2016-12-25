@@ -11,6 +11,11 @@ trait AdvertService {
   def findById(id: Long): Future[Option[Advert]]
 
   def insert(advert: Advert): Future[Long]
+
+  def update(advert: Advert): Future[Int]
+
+  def deleteById(id: Long): Future[Int]
+
 }
 
 class AdvertServiceImpl(advertDao: AdvertDao)(implicit ec: ExecutionContext) extends AdvertService {
@@ -20,4 +25,8 @@ class AdvertServiceImpl(advertDao: AdvertDao)(implicit ec: ExecutionContext) ext
   override def findById(id: Long): Future[Option[Advert]] = advertDao.findById(id)
 
   override def insert(advert: Advert): Future[Long] = advertDao.insert(advert)
+
+  override def update(advert: Advert): Future[Int] = advertDao.update(advert)
+
+  override def deleteById(id: Long): Future[Int] = advertDao.deleteById(id)
 }
