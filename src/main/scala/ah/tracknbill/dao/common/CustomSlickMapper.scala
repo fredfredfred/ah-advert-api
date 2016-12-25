@@ -1,0 +1,37 @@
+package ah.tracknbill.dao.common
+
+import java.sql.{Date, Timestamp}
+import java.time.{LocalDate, LocalDateTime}
+
+import ah.tracknbill.entity.FuelEnum
+import ah.tracknbill.entity.FuelEnum.FuelEnum
+import slick.ast.BaseTypedType
+import slick.driver.PostgresDriver
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.JdbcType
+
+
+object CustomSlickMapper {
+
+  object Postgres {
+
+
+    implicit val fuelEnumMapper = MappedColumnType.base[FuelEnum, String](
+      e => e.toString,
+      s => FuelEnum.withName(s)
+    )
+
+    implicit val localDateTimeColumnType: JdbcType[LocalDateTime] with BaseTypedType[LocalDateTime] =
+      PostgresDriver.MappedColumnType.base[LocalDateTime, Timestamp](
+        localDateTime => Timestamp.valueOf(localDateTime),
+        timestamp => timestamp.toLocalDateTime
+      )
+
+    implicit val localDateColumnType = PostgresDriver.MappedColumnType.base[LocalDate, Date](
+      localDate => Date.valueOf(localDate),
+      date => date.toLocalDate
+    )
+
+  }
+
+}
