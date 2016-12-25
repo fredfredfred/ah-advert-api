@@ -3,8 +3,8 @@ package ah.advert.dao.common
 import java.sql.{Date, Timestamp}
 import java.time.{LocalDate, LocalDateTime}
 
-import ah.advert.entity.FuelEnum
-import ah.advert.entity.FuelEnum.FuelEnum
+import ah.advert.entity.Fuel
+import ah.advert.entity.Fuel.Fuel
 import slick.ast.BaseTypedType
 import slick.driver.PostgresDriver
 import slick.driver.PostgresDriver.api._
@@ -16,9 +16,9 @@ object CustomSlickMapper {
   object Postgres {
 
 
-    implicit val fuelEnumMapper = MappedColumnType.base[FuelEnum, String](
+    implicit val fuelEnumMapper = MappedColumnType.base[Fuel, String](
       e => e.toString,
-      s => FuelEnum.withName(s)
+      s => Fuel.withName(s)
     )
 
     implicit val localDateTimeColumnType: JdbcType[LocalDateTime] with BaseTypedType[LocalDateTime] =

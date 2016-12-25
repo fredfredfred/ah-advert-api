@@ -3,7 +3,7 @@ package ah.advert.entity
 import java.time.LocalDate
 
 import ah.advert.dao.common.CustomSlickMapper.Postgres._
-import ah.advert.entity.FuelEnum.FuelEnum
+import ah.advert.entity.Fuel.Fuel
 import ah.advert.entity.common.{BaseEntity, BaseTable}
 import slick.driver.PostgresDriver.api._
 import slick.lifted.Tag
@@ -15,7 +15,7 @@ import slick.lifted.Tag
 case class Advert(
                    id: Long,
                    title: String,
-                   fuel: FuelEnum,
+                   fuel: Fuel,
                    price: Int,
                    `new`: Boolean,
                    mileage: Option[Int],
@@ -25,7 +25,7 @@ case class Advert(
 class AdvertTable(tag: Tag) extends BaseTable[Advert](tag, "Advert") {
   def title = column[String]("title")
 
-  def fuel = column[FuelEnum]("fuel")
+  def fuel = column[Fuel]("fuel")
 
   def price = column[Int]("price")
 

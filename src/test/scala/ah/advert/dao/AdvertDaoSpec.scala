@@ -3,15 +3,15 @@ package ah.advert.dao
 import java.time.LocalDate
 
 import ah.advert.BaseTest
-import ah.advert.entity.FuelEnum.{DIESEL, GASOLINE}
-import ah.advert.entity.{Advert, FuelEnum}
+import ah.advert.entity.Fuel.{DIESEL, GASOLINE}
+import ah.advert.entity.{Advert, Fuel}
 
 
 class AdvertDaoSpec extends BaseTest {
 
   it should "create and find adverts" in {
     val count = waitForResult(advertDao.count)
-    val idInserted: Long = waitForResult(advertDao.insert(Advert(1, "title1", FuelEnum.DIESEL, 10, true, Some(30000), Some(LocalDate.now))))
+    val idInserted: Long = waitForResult(advertDao.insert(Advert(1, "title1", Fuel.DIESEL, 10, true, Some(30000), Some(LocalDate.now))))
     idInserted should be(count + 1)
 
     val advert: Option[Advert] = waitForResult(advertDao.findById(idInserted))

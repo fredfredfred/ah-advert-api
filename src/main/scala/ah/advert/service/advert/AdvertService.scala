@@ -1,7 +1,7 @@
 package ah.advert.service.advert
 
 import ah.advert.dao.AdvertDao
-import ah.advert.entity.{Advert, FuelEnum}
+import ah.advert.entity.{Advert, Fuel}
 
 import scala.concurrent.{ExecutionContext, Future}
 

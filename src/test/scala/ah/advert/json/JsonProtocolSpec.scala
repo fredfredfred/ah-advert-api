@@ -2,8 +2,8 @@ package ah.advert.json
 
 import java.time.LocalDate
 
-import ah.advert.entity.FuelEnum.GASOLINE
-import ah.advert.entity.{Advert, FuelEnum}
+import ah.advert.entity.Fuel.GASOLINE
+import ah.advert.entity.{Advert, Fuel}
 import ah.advert.json.JsonProtocol._
 import org.scalatest.{FlatSpec, Matchers}
 import spray.json._
@@ -27,14 +27,14 @@ class JsonProtocolSpec extends FlatSpec with Matchers {
     val advert = advertFormat.read(jsonAst)
     advert.id should be(1L)
     advert.title should be("title1")
-    advert.fuel should be(FuelEnum.GASOLINE)
+    advert.fuel should be(Fuel.GASOLINE)
     advert.`new` should be(true)
     advert.price should be(10)
     advert.mileage should be(Some(30000))
   }
 
   it should "serialize FuelEnum" in {
-    val res = fuelEnumJsonFormat.write(FuelEnum.DIESEL)
+    val res = fuelEnumJsonFormat.write(Fuel.DIESEL)
     res.toString should be("\"DIESEL\"")
   }
 
@@ -42,7 +42,7 @@ class JsonProtocolSpec extends FlatSpec with Matchers {
     val json = "\"DIESEL\""
     val jsonAst = json.parseJson
     val res = fuelEnumJsonFormat.read(jsonAst)
-    res should be(FuelEnum.DIESEL)
+    res should be(Fuel.DIESEL)
   }
 
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 import ah.advert.BaseTestRoutes
 import ah.advert.entity.Advert
-import ah.advert.entity.FuelEnum._
+import ah.advert.entity.Fuel._
 import ah.advert.json.JsonProtocol._
 import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
