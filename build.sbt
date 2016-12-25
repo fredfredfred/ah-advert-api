@@ -40,4 +40,4 @@ parallelExecution in Test := false
 
 flywayUrl := "jdbc:postgresql:advert"
 
-flywayUser := "postgresql"
+flywayUser := "advert"

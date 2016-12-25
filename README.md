@@ -2,11 +2,14 @@
 Test restful api with Scala and akka-http
 
 ## Get sources
-You should clone the [repo](https://github.com/fredfredfred/ah-advert-api) and install the latest postgresql database on your system. You can use these steps:
-* clone repo: ```git clone https://github.com/fredfredfred/ah-advert-api.git```
+Clone the [repo](https://github.com/fredfredfred/ah-advert-api) 
+    
+    git clone https://github.com/fredfredfred/ah-advert-api.git
 
 ## Install postgresql
-* install postgresql: ```brew install postgresql``` (on MacOs)
+Install the latest postgresql database. I used version 9.6.1. On MacOS you can use homebrew:
+
+    brew install postgres
 
 ## Create DBs
 Either run ```scripts/dbCreate.sh ``` or 
@@ -14,8 +17,16 @@ Either run ```scripts/dbCreate.sh ``` or
 * create test DB: ```createdb advert_test```
 
 ## Start database
-* ```scripts/dbStart.sh```
+    scripts/dbStart.sh
+
+## Create schema
+    sbt flywayMigrate
 
 ## Compile
-* ```sbt compile```
+    sbt compile
+    
+## Run
+Make sure port 9000 is not used!
+
+    sbt run
 
