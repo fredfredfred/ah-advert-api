@@ -23,7 +23,7 @@ case class Advert(
 
 
 class AdvertTable(tag: Tag) extends BaseTable[Advert](tag, "Advert") {
-  def title = column[String]("name")
+  def title = column[String]("title")
 
   def fuel = column[FuelEnum]("fuel")
 
