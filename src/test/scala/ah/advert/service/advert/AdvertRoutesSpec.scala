@@ -6,17 +6,15 @@ import ah.advert.BaseTestRoutes
 import ah.advert.entity.Advert
 import ah.advert.entity.Fuel._
 import ah.advert.json.JsonProtocol._
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.Authorization
-import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 
 class AdvertRoutesSpec extends BaseTestRoutes {
 
   val testPath = "/advert"
 
   it should "return an empty list on a fresh db" in {
-    val authHeader: Authorization = getAuthHeader
-
-    Get(testPath) ~> authHeader ~> advertRoutes.routes ~> check {
+    Get(testPath)  ~> advertRoutes.routes ~> check {
       responseAs[Seq[Advert]] shouldEqual Seq.empty[Advert]
     }
   }
@@ -29,7 +27,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       responseAs[String] should not be empty
     }
 
-    Get(testPath)  ~> advertRoutes.routes ~> check {
+    Get(testPath) ~> advertRoutes.routes ~> check {
       val adverts = responseAs[Seq[Advert]]
       adverts should not be empty
     }
@@ -41,14 +39,14 @@ class AdvertRoutesSpec extends BaseTestRoutes {
 
     var id: String = ""
     Post(testPath, advert1) ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.Created)
+      status should ===(StatusCodes.Created)
       id = responseAs[String]
       id should not be empty
     }
 
     var advert: Advert = null
-    Get(s"$testPath/$id")  ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.OK)
+    Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.OK)
       val str = responseAs[String]
       str should not be (null)
       advert = responseAs[Advert]
@@ -62,12 +60,12 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     }
 
 
-    Put(s"$testPath/$id", advert.copy(`new` = true))  ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.NoContent)
+    Put(s"$testPath/$id", advert.copy(`new` = true)) ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.NoContent)
     }
 
-    Get(s"$testPath/$id")  ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.OK)
+    Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.OK)
       val str = responseAs[String]
       str should not be (null)
       advert = responseAs[Advert]
@@ -75,20 +73,79 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       advert.`new` should be(true)
     }
 
-    Put(s"$testPath/$id", advert.copy(fuel = GASOLINE, mileage = None, firstRegistration = None))  ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.NoContent)
+    Put(s"$testPath/$id", advert.copy(fuel = GASOLINE, mileage = None, firstRegistration = None)) ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.NoContent)
     }
 
-    Get(s"$testPath/$id")  ~> advertRoutes.routes ~> check {
-      status should === (StatusCodes.OK)
+    Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.OK)
       val str = responseAs[String]
       str should not be (null)
       advert = responseAs[Advert]
       advert should not be (null)
       advert.fuel should be(GASOLINE)
-      advert.mileage should be (None)
+      advert.mileage should be(None)
       advert.firstRegistration should be(None)
     }
 
   }
+
+  it should "delete an advert" in {
+    val date = LocalDate.now
+    val advert1 = Advert(2, "deleteme", DIESEL, 40000, true, None, None)
+
+    var id: String = ""
+    Post(testPath, advert1) ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.Created)
+      id = responseAs[String]
+      id should not be empty
+    }
+
+    var advert: Advert = null
+    Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.OK)
+      val str = responseAs[String]
+      str should not be (null)
+      advert = responseAs[Advert]
+      advert.title should be("deleteme")
+    }
+
+    Delete(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.NoContent)
+    }
+
+    Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
+      status should ===(StatusCodes.NotFound)
+    }
+  }
+
+  it should "return all adverts sorted by id" in {
+    // create adverts
+    mockAdverts.foreach(advert =>
+      Post(testPath, advert) ~> advertRoutes.routes ~> check {
+        status should ===(StatusCodes.Created)
+        val id = responseAs[String]
+        id should not be empty
+      }
+    )
+    Get(testPath)  ~> advertRoutes.routes ~> check {
+      val adverts = responseAs[Seq[Advert]]
+      adverts should not be empty
+      (adverts, adverts.tail).zipped.forall(_.id <= _.id) should be (true)
+    }
+
+
+  }
+
+  def mockAdverts = Seq(
+    Advert(1, "title1", GASOLINE, 10, `new` = true, Some(30000), Some(LocalDate.now)),
+    Advert(1, "title2", DIESEL, 10, `new` = true, Some(40000), None),
+    Advert(1, "title3", GASOLINE, 10, `new` = true, None, Some(LocalDate.now)),
+    Advert(1, "title4", DIESEL, 10, `new` = true, None, None),
+    Advert(1, "title1", GASOLINE, 10, `new` = true, Some(50000), Some(LocalDate.now)),
+    Advert(1, "title5", DIESEL, 10, `new` = true, Some(60000), None),
+    Advert(1, "title6", GASOLINE, 10, `new` = true, None, Some(LocalDate.now)),
+    Advert(1, "title7", DIESEL, 10, `new` = true, None, None)
+  )
+
 }

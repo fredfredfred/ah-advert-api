@@ -21,4 +21,6 @@ class AdvertDaoImpl(dbConfig: DatabaseConfig[JdbcProfile], profile: JdbcProfile)
     with AdvertDao {
 
   val query: _root_.slick.driver.PostgresDriver.api.TableQuery[AdvertTable] = super.getQuery
+
+
 }

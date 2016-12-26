@@ -4,12 +4,12 @@ to create, read update and delete car adverts. The data is stored using slick an
 
       {
         "id": 3,
-        "title": "Audi A4 Avant"
+        "title": "Audi A4 Avant",
         "mileage": 37000,
         "price": 11750,
         "fuel": "GASOLINE",
         "new": false,
-        "firstRegistration": "2012-12-25",
+        "firstRegistration": "2012-12-25"
       }
 
 
@@ -38,7 +38,7 @@ Either run ```scripts/dbCreate.sh ``` or
     sbt compile
     
 ## Run
-Make sure port 9000 is not used!
+Make sure port 9000 is not used or configure it in application.conf (http.port).
 
     sbt run
 
@@ -51,8 +51,46 @@ Make sure port 9000 is not used!
     PUT     /advert/:id             Updates the advert with the identifier :id if found
                                       or creates a new one and returns the id (like POST)
     DELETE  /advert/:id             Deletes the advert with the identifier :id
-## Test
+## Test with curl
+GET     /advert
+ 
+    curl -X GET -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert"
+    
+GET     /advert?sort=price&asc
 
+GET     /advert/1
+
+    curl -X GET -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert/1"
+
+POST    /advert
+
+The id is not relevant and will be generated
+
+    curl -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache" -d '{
+        "id": 3,
+        "title": "Audi A4 Avant",
+        "mileage": 37000,
+        "price": 11750,
+        "fuel": "GASOLINE",
+        "new": false,
+        "firstRegistration": "2012-12-25"
+      }' "http://localhost:9000/advert"
+
+PUT     /advert/1
+
+    curl -X PUT -H "Content-Type: application/json" -H "Cache-Control: no-cache" -d '{
+      "mileage": 1,
+      "price": 1,
+      "fuel": "GASOLINE",
+      "id": 1,
+      "new": true,
+      "firstRegistration": "2016-12-01",
+      "title": "Title 1111"
+    }' "http://localhost:9000/advert/1"
+
+DELETE  /advert/1
+
+    curl -X DELETE -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert/1"
 
 ## Known limitations
 * The find all adverts really returns all of them. In a production scenario this should be
