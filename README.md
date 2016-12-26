@@ -44,8 +44,10 @@ Make sure port 9000 is not used or configure it in application.conf (http.port).
 
 ## API
     GET     /advert                 Gets a list of all adverts
-    GET     /advert?sort=price&asc  Gets a list of all adverts sorted by price ascending
-                                      sortfields
+    GET     /advert?sort=price&order=asc  
+                                    Gets a list of all adverts sorted by price ascending
+                                      sort: id (default) | title | fuel | price | mileage | firstRegistration
+                                      order: asc (default) | desc
     GET     /advert/:id             Gets the advert with the identifier :id
     POST    /advert                 Creates a new advert and returns the id
     PUT     /advert/:id             Updates the advert with the identifier :id if found

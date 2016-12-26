@@ -66,11 +66,13 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
     cors() {
       path(basePath) {
         get {
-          onComplete(advertService.findAll().mapTo[Seq[Advert]]) {
-            case Success(advertList) => complete(advertList)
-            case Failure(ex) => {
-              logger.error("Error requesting latest adverts", ex)
-              complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
+          parameters('sort, 'order ? "white") { (color, backgroundColor) =>
+            onComplete(advertService.findAll().mapTo[Seq[Advert]]) {
+              case Success(advertList) => complete(advertList)
+              case Failure(ex) => {
+                logger.error("Error requesting latest adverts", ex)
+                complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
+              }
             }
           }
         }

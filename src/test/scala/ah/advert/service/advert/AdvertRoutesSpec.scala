@@ -3,18 +3,18 @@ package ah.advert.service.advert
 import java.time.LocalDate
 
 import ah.advert.BaseTestRoutes
+import ah.advert.data.AdvertData
 import ah.advert.entity.Advert
 import ah.advert.entity.Fuel._
 import ah.advert.json.JsonProtocol._
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.Authorization
 
 class AdvertRoutesSpec extends BaseTestRoutes {
 
   val testPath = "/advert"
 
   it should "return an empty list on a fresh db" in {
-    Get(testPath)  ~> advertRoutes.routes ~> check {
+    Get(testPath) ~> advertRoutes.routes ~> check {
       responseAs[Seq[Advert]] shouldEqual Seq.empty[Advert]
     }
   }
@@ -119,33 +119,23 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     }
   }
 
-  it should "return all adverts sorted by id" in {
+  it should "return all adverts with default sorting by id" in {
     // create adverts
-    mockAdverts.foreach(advert =>
+    AdvertData.mockAdvertsList1.foreach(advert =>
       Post(testPath, advert) ~> advertRoutes.routes ~> check {
         status should ===(StatusCodes.Created)
         val id = responseAs[String]
         id should not be empty
       }
     )
-    Get(testPath)  ~> advertRoutes.routes ~> check {
+    Get(testPath) ~> advertRoutes.routes ~> check {
       val adverts = responseAs[Seq[Advert]]
       adverts should not be empty
-      (adverts, adverts.tail).zipped.forall(_.id <= _.id) should be (true)
+      (adverts, adverts.tail).zipped.forall(_.id <= _.id) should be(true)
     }
 
 
   }
 
-  def mockAdverts = Seq(
-    Advert(1, "title1", GASOLINE, 10, `new` = true, Some(30000), Some(LocalDate.now)),
-    Advert(1, "title2", DIESEL, 10, `new` = true, Some(40000), None),
-    Advert(1, "title3", GASOLINE, 10, `new` = true, None, Some(LocalDate.now)),
-    Advert(1, "title4", DIESEL, 10, `new` = true, None, None),
-    Advert(1, "title1", GASOLINE, 10, `new` = true, Some(50000), Some(LocalDate.now)),
-    Advert(1, "title5", DIESEL, 10, `new` = true, Some(60000), None),
-    Advert(1, "title6", GASOLINE, 10, `new` = true, None, Some(LocalDate.now)),
-    Advert(1, "title7", DIESEL, 10, `new` = true, None, None)
-  )
 
 }
