@@ -84,7 +84,7 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
           onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
             case Success(advertOption) => advertOption match {
               case Some(advert) => complete(advert)
-              case None => complete(NotFound, s"The supplier doesn't exist")
+              case None => complete(NotFound, s"The advert doesn't exist")
             }
             case Failure(ex) => {
               logger.error(s"Error requesting advert with id=$advertId", ex)

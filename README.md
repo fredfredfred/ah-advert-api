@@ -30,3 +30,8 @@ Make sure port 9000 is not used!
 
     sbt run
 
+
+## Known limitations
+* The find all adverts really returns all of them. In a production scenario this should be
+ somehow limited, for example with a paged access.
+* There is no authentication => Should be secured in some way in production

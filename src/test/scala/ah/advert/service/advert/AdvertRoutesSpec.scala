@@ -62,8 +62,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     }
 
 
-    val advert2= Advert(2, "title2", DIESEL, 20, true, Some(30000), Some(date)).copy(id = id.toLong)
-    Put(s"$testPath/$id", advert2)  ~> advertRoutes.routes ~> check {
+    Put(s"$testPath/$id", advert.copy(`new` = true))  ~> advertRoutes.routes ~> check {
       status should === (StatusCodes.NoContent)
     }
 
@@ -74,6 +73,21 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       advert = responseAs[Advert]
       advert should not be (null)
       advert.`new` should be(true)
+    }
+
+    Put(s"$testPath/$id", advert.copy(fuel = GASOLINE, mileage = None, firstRegistration = None))  ~> advertRoutes.routes ~> check {
+      status should === (StatusCodes.NoContent)
+    }
+
+    Get(s"$testPath/$id")  ~> advertRoutes.routes ~> check {
+      status should === (StatusCodes.OK)
+      val str = responseAs[String]
+      str should not be (null)
+      advert = responseAs[Advert]
+      advert should not be (null)
+      advert.fuel should be(GASOLINE)
+      advert.mileage should be (None)
+      advert.firstRegistration should be(None)
     }
 
   }
