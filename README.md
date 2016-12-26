@@ -18,6 +18,9 @@ Clone the [repo](https://github.com/fredfredfred/ah-advert-api)
     
     git clone https://github.com/fredfredfred/ah-advert-api.git
 
+## Prerequisites
+You must have Java > 1.8, Scala > 2.11.8, Sbt > 13.11, Postgres > 9.6.1 (see next step) installed.
+
 ## Install postgresql
 Install the latest postgresql database. I used version 9.6.1. On MacOS you can use homebrew:
 
@@ -36,6 +39,9 @@ Either run ```scripts/dbCreate.sh ``` or
 
 ## Compile
     sbt compile
+    
+## Test
+    sbt test
     
 ## Run
 Make sure port 9000 is not used or configure it in application.conf (http.port).
@@ -57,12 +63,16 @@ Make sure port 9000 is not used or configure it in application.conf (http.port).
 GET     /advert
  
     curl -X GET -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert"
+return code on success: 200    
     
 GET     /advert?sort=price&asc
+
+return code on success: 200
 
 GET     /advert/1
 
     curl -X GET -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert/1"
+return code on success: 200
 
 POST    /advert
 
@@ -77,6 +87,8 @@ The id is not relevant and will be generated
         "new": false,
         "firstRegistration": "2012-12-25"
       }' "http://localhost:9000/advert"
+return code on success: 201
+
 
 PUT     /advert/1
 
@@ -89,12 +101,15 @@ PUT     /advert/1
       "firstRegistration": "2016-12-01",
       "title": "Title 1111"
     }' "http://localhost:9000/advert/1"
+return code on success: 204, 201 (on creation)
 
 DELETE  /advert/1
 
     curl -X DELETE -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert/1"
+return code on success: 204
 
 ## Known limitations
 * The find all adverts really returns all of them. In a production scenario this should be
  somehow limited, for example with a paged access.
 * There is no authentication => Should be secured in some way in production
+* On create the returned data is a plain string instead of JSON containing the id of the created advert

@@ -19,7 +19,12 @@ case class Advert(
                    price: Int,
                    `new`: Boolean,
                    mileage: Option[Int],
-                   firstRegistration: Option[LocalDate]) extends BaseEntity
+                   firstRegistration: Option[LocalDate]) extends BaseEntity {
+  require(price > 0, "price cannot be negative")
+  require(mileage.forall(_ > 0), "mileage cannot be negative")
+  require(firstRegistration.map(date => (date isAfter LocalDate.of(1900,1,1 )) && (date isBefore LocalDate.now)).getOrElse(true),
+    "registration date must be between 1900 and today")
+}
 
 
 class AdvertTable(tag: Tag) extends BaseTable[Advert](tag, "Advert") {

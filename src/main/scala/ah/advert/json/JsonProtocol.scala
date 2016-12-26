@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import ah.advert.entity.{Advert, Fuel}
+import ah.advert.service.advert.{AdvertSortField, SortOrder}
 import ah.advert.service.auth.{AuthResponse, LoginRequest}
 import spray.json.DefaultJsonProtocol._
 import spray.json.{DeserializationException, JsString, JsValue, RootJsonFormat}

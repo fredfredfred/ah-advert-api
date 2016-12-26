@@ -5,6 +5,7 @@ import java.time.LocalDate
 import ah.advert.entity.Fuel.GASOLINE
 import ah.advert.entity.{Advert, Fuel}
 import ah.advert.json.JsonProtocol._
+import ah.advert.service.advert.AdvertSortField
 import org.scalatest.{FlatSpec, Matchers}
 import spray.json._
 

@@ -80,11 +80,11 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
       status should ===(StatusCodes.OK)
       val str = responseAs[String]
-      str should not be (null)
+      str should not be null
       advert = responseAs[Advert]
-      advert should not be (null)
-      advert.fuel should be(GASOLINE)
-      advert.mileage should be(None)
+      advert should not be null
+      advert.fuel should be (GASOLINE)
+      advert.mileage should be (None)
       advert.firstRegistration should be(None)
     }
 
@@ -105,7 +105,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     Get(s"$testPath/$id") ~> advertRoutes.routes ~> check {
       status should ===(StatusCodes.OK)
       val str = responseAs[String]
-      str should not be (null)
+      str should not be null
       advert = responseAs[Advert]
       advert.title should be("deleteme")
     }
@@ -137,7 +137,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   it should "return adverts sorted by price ascending" in {
     AdvertData.mockAdvertsList2.foreach(advert =>
       Post(testPath, advert) ~> advertRoutes.routes ~> check {
-        status should === (StatusCodes.Created)
+        status should ===(StatusCodes.Created)
       }
     )
     Get(s"$testPath?sort=price") ~> advertRoutes.routes ~> check {
@@ -150,7 +150,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   it should "return adverts sorted by price descending" in {
     AdvertData.mockAdvertsList2.foreach(advert =>
       Post(testPath, advert) ~> advertRoutes.routes ~> check {
-        status should === (StatusCodes.Created)
+        status should ===(StatusCodes.Created)
       }
     )
     Get(s"$testPath?sort=price&order=desc") ~> advertRoutes.routes ~> check {

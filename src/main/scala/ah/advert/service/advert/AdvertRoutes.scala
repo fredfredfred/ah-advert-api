@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionContext, implicit val actorSystem: ActorSystem)
   extends DefaultJsonProtocol with SprayJsonSupport with SessionSupport {
@@ -28,17 +28,16 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
 
 
   def createOrUpdateAdvert(advertId: Long, advert: Advert): Route = {
-    if (advertId != advert.id) {
-      complete(BadRequest, s"ids of request and data do not match: request id=${advertId} data id=${advert.id}")
-    }
-    onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
-      case Success(advertOption) => advertOption match {
-        case Some(foundAdvert) => updateAdvert(advert)
-        case None => createAdvert(advert)
-      }
-      case Failure(ex) => {
-        logger.error(s"Error updating advert with id=$advertId", ex)
-        complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+    validate(advertId == advert.id, s"ids of request and data do not match: request id=${advertId} data id=${advert.id}") {
+      onComplete(advertService.findById(advertId).mapTo[Option[Advert]]) {
+        case Success(advertOption) => advertOption match {
+          case Some(foundAdvert) => updateAdvert(advert)
+          case None => createAdvert(advert)
+        }
+        case Failure(ex) => {
+          logger.error(s"Error updating advert with id=$advertId", ex)
+          complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+        }
       }
     }
   }
@@ -61,17 +60,22 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
     }
   }
 
+  //  implicit def sortStuff: Unmarshaller[String, AdvertSortField] = Unmarshaller.stringUnmarshaller.map(x => AdvertSortField.withName(_))
 
   val allAdvertsRoute: Route =
     cors() {
       path(basePath) {
         get {
           parameters('sort ? "id", 'order ? "asc") { (sort, order) =>
-            onComplete(advertService.findAll(AdvertSortField.withName(sort), Sorted.withName(order)).mapTo[Seq[Advert]]) {
-              case Success(advertList) => complete(advertList)
-              case Failure(ex) => {
-                logger.error("Error requesting latest adverts", ex)
-                complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
+            validate(Try(AdvertSortField.withName(sort)).isSuccess, s"value of query parameter sort is not in ${AdvertSortField.values}") {
+              validate(Try(SortOrder.withName(order)).isSuccess, s"value of query parameter order is not in ${SortOrder.values}") {
+                onComplete(advertService.findAll(AdvertSortField.withName(sort), SortOrder.withName(order)).mapTo[Seq[Advert]]) {
+                  case Success(advertList) => complete(advertList)
+                  case Failure(ex) => {
+                    logger.error("Error requesting latest adverts", ex)
+                    complete(InternalServerError, s"An error occurred reading latest adverts: ${ex.getMessage}")
+                  }
+                }
               }
             }
           }
