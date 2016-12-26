@@ -124,18 +124,40 @@ class AdvertRoutesSpec extends BaseTestRoutes {
     AdvertData.mockAdvertsList1.foreach(advert =>
       Post(testPath, advert) ~> advertRoutes.routes ~> check {
         status should ===(StatusCodes.Created)
-        val id = responseAs[String]
-        id should not be empty
       }
     )
+
     Get(testPath) ~> advertRoutes.routes ~> check {
       val adverts = responseAs[Seq[Advert]]
       adverts should not be empty
       (adverts, adverts.tail).zipped.forall(_.id <= _.id) should be(true)
     }
-
-
   }
 
+  it should "return adverts sorted by price ascending" in {
+    AdvertData.mockAdvertsList2.foreach(advert =>
+      Post(testPath, advert) ~> advertRoutes.routes ~> check {
+        status should === (StatusCodes.Created)
+      }
+    )
+    Get(s"$testPath?sort=price") ~> advertRoutes.routes ~> check {
+      val adverts = responseAs[Seq[Advert]]
+      adverts should not be empty
+      (adverts, adverts.tail).zipped.forall(_.price <= _.price) should be(true)
+    }
+  }
+
+  it should "return adverts sorted by price descending" in {
+    AdvertData.mockAdvertsList2.foreach(advert =>
+      Post(testPath, advert) ~> advertRoutes.routes ~> check {
+        status should === (StatusCodes.Created)
+      }
+    )
+    Get(s"$testPath?sort=price&order=desc") ~> advertRoutes.routes ~> check {
+      val adverts = responseAs[Seq[Advert]]
+      adverts should not be empty
+      (adverts, adverts.tail).zipped.forall(_.price >= _.price) should be(true)
+    }
+  }
 
 }

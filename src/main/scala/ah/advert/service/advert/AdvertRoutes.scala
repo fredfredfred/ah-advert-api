@@ -66,8 +66,8 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
     cors() {
       path(basePath) {
         get {
-          parameters('sort, 'order ? "white") { (color, backgroundColor) =>
-            onComplete(advertService.findAll().mapTo[Seq[Advert]]) {
+          parameters('sort ? "id", 'order ? "asc") { (sort, order) =>
+            onComplete(advertService.findAll(AdvertSortField.withName(sort), Sorted.withName(order)).mapTo[Seq[Advert]]) {
               case Success(advertList) => complete(advertList)
               case Failure(ex) => {
                 logger.error("Error requesting latest adverts", ex)

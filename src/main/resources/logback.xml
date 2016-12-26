@@ -10,7 +10,7 @@
     </appender>
 
     <logger name="slick" level="INFO" />
-    <logger name="com.zaxxer.hikari.pool" level="INFO"/>
+    <logger name="com.zaxxer" level="INFO"/>
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />

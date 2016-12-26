@@ -3,7 +3,7 @@ package ah.advert.service.advert
 import ah.advert.dao.AdvertDao
 import ah.advert.entity.Advert
 import ah.advert.service.advert.AdvertSortField.AdvertSortField
-import ah.advert.service.advert.Sorted._
+import ah.advert.service.advert.Sorted.Sorted
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +28,7 @@ class AdvertServiceImpl(advertDao: AdvertDao)(implicit ec: ExecutionContext) ext
 
   // in a production service this should be limited or paged, which is skipped here for simplicity
   // all the sorting should be done in the DB as well and is skipped here for simplicity
-  override def findAll(): Future[Seq[Advert]] = findAll(AdvertSortField.id, ASC)
+  override def findAll(): Future[Seq[Advert]] = findAll(AdvertSortField.id, Sorted.asc)
 
   override def findAll(sortField: AdvertSortField, sorted: Sorted): Future[Seq[Advert]] = {
     val res: Future[Seq[Advert]] = advertDao.findByFilter(x => true)

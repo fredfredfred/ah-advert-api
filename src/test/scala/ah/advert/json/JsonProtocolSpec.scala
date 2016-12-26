@@ -14,9 +14,11 @@ import spray.json._
 class JsonProtocolSpec extends FlatSpec with Matchers {
 
   it should "serialize adverts to json" in {
-    val advert = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.now))
+    val advert = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.of(2016,12,12)))
     val result = advertFormat.write(advert)
-    val jsonString = """{"mileage":30000,"price":10,"fuel":"GASOLINE","id":1,"new":true,"firstRegistration":"2016-12-25","title":"title1"}"""
+    val jsonString = """{"mileage":30000,"price":10,"fuel":"GASOLINE","id":1,"new":true,"firstRegistration":"2016-12-12","title":"title1"}"""
+    println(result)
+    println(jsonString)
     result.toString should be(jsonString)
 
   }
@@ -31,6 +33,7 @@ class JsonProtocolSpec extends FlatSpec with Matchers {
     advert.`new` should be(true)
     advert.price should be(10)
     advert.mileage should be(Some(30000))
+    advert.firstRegistration should be(Some(LocalDate.of(2016,12,25)))
   }
 
   it should "serialize FuelEnum" in {
