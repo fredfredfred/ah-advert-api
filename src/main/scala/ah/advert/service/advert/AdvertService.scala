@@ -20,7 +20,7 @@ trait AdvertService {
 
 class AdvertServiceImpl(advertDao: AdvertDao)(implicit ec: ExecutionContext) extends AdvertService {
 
-  override def findAll(): Future[Seq[Advert]] = advertDao.findByFilter(x => true)
+  override def findAll(): Future[Seq[Advert]] = advertDao.findByFilter(x => true) // this should be limited, paged
 
   override def findById(id: Long): Future[Option[Advert]] = advertDao.findById(id)
 

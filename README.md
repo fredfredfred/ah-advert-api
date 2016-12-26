@@ -1,5 +1,17 @@
 # ah-advert-api
-Test restful api with Scala and akka-http
+This is just a test implementation of a very simple restful api with Scala and akka-http which allows you
+to create, read update and delete car adverts. The data is stored using slick and postgres. The adverts look like this:
+
+      {
+        "id": 3,
+        "title": "Audi A4 Avant"
+        "mileage": 37000,
+        "price": 11750,
+        "fuel": "GASOLINE",
+        "new": false,
+        "firstRegistration": "2012-12-25",
+      }
+
 
 ## Get sources
 Clone the [repo](https://github.com/fredfredfred/ah-advert-api) 
@@ -29,6 +41,17 @@ Either run ```scripts/dbCreate.sh ``` or
 Make sure port 9000 is not used!
 
     sbt run
+
+## API
+    GET     /advert                 Gets a list of all adverts
+    GET     /advert?sort=price&asc  Gets a list of all adverts sorted by price ascending
+                                      sortfields
+    GET     /advert/:id             Gets the advert with the identifier :id
+    POST    /advert                 Creates a new advert and returns the id
+    PUT     /advert/:id             Updates the advert with the identifier :id if found
+                                      or creates a new one and returns the id (like POST)
+    DELETE  /advert/:id             Deletes the advert with the identifier :id
+## Test
 
 
 ## Known limitations

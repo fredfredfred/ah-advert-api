@@ -20,14 +20,14 @@ import scala.util.{Failure, Success}
 
 class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionContext, implicit val actorSystem: ActorSystem)
   extends DefaultJsonProtocol with SprayJsonSupport with SessionSupport {
-  val logger = LoggerFactory.getLogger(classOf[AdvertRoutes])
+  private val logger = LoggerFactory.getLogger(classOf[AdvertRoutes])
 
   val basePath = "advert"
 
   implicit lazy val refreshTokenStorage: RefreshTokenStorage[SessionData] = wire[RefreshTokenStorageImpl]
 
 
-  def createOrUpdateAdvert(advertId: Long, advert: Advert) = {
+  def createOrUpdateAdvert(advertId: Long, advert: Advert): Route = {
     if (advertId != advert.id) {
       complete(BadRequest, s"ids of request and data do not match: request id=${advertId} data id=${advert.id}")
     }
@@ -43,7 +43,7 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
     }
   }
 
-  def updateAdvert(advert: Advert) = onComplete(advertService.update(advert).mapTo[Int]) {
+  def updateAdvert(advert: Advert): Route = onComplete(advertService.update(advert).mapTo[Int]) {
     case Success(id) => complete(NoContent) // http 204
     case Failure(ex) => {
       logger.error(s"Error updating advert with id=${advert.id}", ex)
@@ -77,7 +77,7 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
       }
     }
 
-  val getAdvertRoute =
+  val getAdvertRoute: Route =
     cors() {
       path(basePath / LongNumber) { (advertId) =>
         get {
@@ -95,7 +95,7 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
       }
     }
 
-  val createAdvertRoute =
+  val createAdvertRoute: Route =
     cors() {
       path(basePath) {
         post {
@@ -106,7 +106,7 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
       }
     }
 
-  val updateAdvertRoute =
+  val updateAdvertRoute: Route =
     cors() {
       path(basePath / LongNumber) { (advertId) =>
         put {
@@ -116,8 +116,27 @@ class AdvertRoutes(val advertService: AdvertService)(implicit val ec: ExecutionC
       }
     }
 
+  val deleteAdvertRoute: Route =
+    cors() {
+      path(basePath / LongNumber) { (advertId) =>
+        delete {
+          onComplete(advertService.deleteById(advertId).mapTo[Int]) {
+            case Success(rowCount) => rowCount match {
+              case 0 => complete(NotFound, s"The advert doesn't exist")
+              case 1 => complete(NoContent)
+              case _ => complete(BadRequest, s"More than one advert has been deleted => This must not happen!")
+            }
+            case Failure(ex) => {
+              logger.error(s"Error deleting advert with id=$advertId", ex)
+              complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+            }
+          }
+        }
+      }
+    }
 
-  val routes: Route = allAdvertsRoute ~ getAdvertRoute ~ createAdvertRoute ~ updateAdvertRoute
+
+  val routes: Route = allAdvertsRoute ~ getAdvertRoute ~ createAdvertRoute ~ updateAdvertRoute ~ deleteAdvertRoute
 
 
 }
