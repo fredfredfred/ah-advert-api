@@ -113,3 +113,4 @@ return code on success: 204
  somehow limited, for example with a paged access.
 * There is no authentication => Should be secured in some way in production
 * On create the returned data is a plain string instead of JSON containing the id of the created advert
++ Error messages are not in JSON format, but plain text. This can be easily fixed when an error message format is defined
