@@ -9,7 +9,6 @@ import ah.advert.entity.Fuel._
 import ah.advert.json.JsonProtocol._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.ValidationRejection
-import spray.json.DefaultJsonProtocol.jsonFormat7
 
 class AdvertRoutesSpec extends BaseTestRoutes {
 
@@ -22,7 +21,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   }
 
   it should "create create a new advert" in {
-    val advert1 = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.of(2010,10,10)))
+    val advert1 = Advert(1, "title1", GASOLINE, 10, false, Some(30000), Some(LocalDate.of(2010, 10, 10)))
 
     Post(testPath, advert1) ~> advertRoutes.routes ~> check {
       status === StatusCodes.Created
@@ -36,7 +35,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   }
 
   it should "update an existing advert" in {
-    val date = LocalDate.of(2010,10,10)
+    val date = LocalDate.of(2010, 10, 10)
     val advert1 = Advert(2, "title2", DIESEL, 20, false, Some(30000), Some(date))
 
     var id: String = ""
@@ -57,12 +56,13 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       advert.title should be("title2")
       advert.fuel should be(DIESEL)
       advert.`new` should be(false)
+      advert.price should be(20)
       advert.mileage should be(Some(30000))
       advert.firstRegistration should be(Some(date))
     }
 
 
-    Put(s"$testPath/$id", advert.copy(`new` = true)) ~> advertRoutes.routes ~> check {
+    Put(s"$testPath/$id", advert.copy(price = 15)) ~> advertRoutes.routes ~> check {
       status should ===(StatusCodes.NoContent)
     }
 
@@ -72,10 +72,10 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       str should not be (null)
       advert = responseAs[Advert]
       advert should not be (null)
-      advert.`new` should be(true)
+      advert.price should be(15)
     }
 
-    Put(s"$testPath/$id", advert.copy(fuel = GASOLINE, mileage = None, firstRegistration = None)) ~> advertRoutes.routes ~> check {
+    Put(s"$testPath/$id", advert.copy(fuel = GASOLINE, mileage = None, `new` = true, firstRegistration = None)) ~> advertRoutes.routes ~> check {
       status should ===(StatusCodes.NoContent)
     }
 
@@ -85,8 +85,9 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       str should not be null
       advert = responseAs[Advert]
       advert should not be null
-      advert.fuel should be (GASOLINE)
-      advert.mileage should be (None)
+      advert.fuel should be(GASOLINE)
+      advert.mileage should be(None)
+      advert.`new` should be(true)
       advert.firstRegistration should be(None)
     }
 
@@ -163,30 +164,30 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   }
 
   it should "return reject an unknown sort field" in {
-    Get(s"$testPath?sort=pretzel&order=desc") ~> advertRoutes.routes ~>  check {
-      rejection shouldBe a [ValidationRejection]
+    Get(s"$testPath?sort=pretzel&order=desc") ~> advertRoutes.routes ~> check {
+      rejection shouldBe a[ValidationRejection]
     }
   }
 
   it should "return reject an unknown order field" in {
-    Get(s"$testPath?sort=id&order=bla") ~> advertRoutes.routes ~>  check {
-      rejection shouldBe a [ValidationRejection]
+    Get(s"$testPath?sort=id&order=bla") ~> advertRoutes.routes ~> check {
+      rejection shouldBe a[ValidationRejection]
     }
   }
 
   it should "return reject a negative price" in {
     case class BrokenAdvert(
-                       id: Long,
-                       title: String,
-                       fuel: Fuel,
-                       price: Int,
-                       `new`: Boolean,
-                       mileage: Option[Int],
-                       firstRegistration: Option[LocalDate])
+                             id: Long,
+                             title: String,
+                             fuel: Fuel,
+                             price: Int,
+                             `new`: Boolean,
+                             mileage: Option[Int],
+                             firstRegistration: Option[LocalDate])
     implicit val brokenAdvertFormat = jsonFormat7(BrokenAdvert.apply)
-    val brokenAdvert = BrokenAdvert(1, "title1", GASOLINE, -10, true, Some(30000), Some(LocalDate.of(2010,10,10)))
+    val brokenAdvert = BrokenAdvert(1, "title1", GASOLINE, -10, true, Some(30000), Some(LocalDate.of(2010, 10, 10)))
     Post(testPath, brokenAdvert) ~> advertRoutes.routes ~> check {
-      rejection shouldBe a [ValidationRejection]
+      rejection shouldBe a[ValidationRejection]
     }
   }
 
