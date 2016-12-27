@@ -22,7 +22,7 @@ case class Advert(
                    firstRegistration: Option[LocalDate]) extends BaseEntity {
   require(price > 0, "price cannot be negative")
   require(mileage.forall(_ > 0), "mileage cannot be negative")
-  require(firstRegistration.map(date => (date isAfter LocalDate.of(1900,1,1 )) && (date isBefore LocalDate.now)).getOrElse(true),
+  require(firstRegistration.forall(date => (date isAfter LocalDate.of(1900, 1, 1)) && (date isBefore LocalDate.now)),
     "registration date must be between 1900 and today")
   require(`new` ^ firstRegistration.isDefined, "used cars must have a date of first registration, new cars must not have one.")
 }
