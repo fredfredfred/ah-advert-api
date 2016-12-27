@@ -26,16 +26,19 @@ Install the latest postgresql database. I used version 9.6.1. On MacOS you can u
 
     brew install postgres
 
-## Create DBs
-run the script
-
-    scripts/dbCreate.sh 
-
 ## Start database
+
+    pg_ctl -D /usr/local/var/postgres start
+
+To stop it, run: 
+    
+    pg_ctl -D /usr/local/var/postgres stop
+
+## Create advert DBs and roles
 run the script
 
-    scripts/dbStart.sh
-
+    scripts/dbCreate.sh
+    
 ## Create schema
     sbt flywayMigrate
 
