@@ -27,11 +27,13 @@ Install the latest postgresql database. I used version 9.6.1. On MacOS you can u
     brew install postgres
 
 ## Create DBs
-Either run ```scripts/dbCreate.sh ``` or 
-* create DB: ```createdb advert```
-* create test DB: ```createdb advert_test```
+run the script
+
+    scripts/dbCreate.sh 
 
 ## Start database
+run the script
+
     scripts/dbStart.sh
 
 ## Create schema
