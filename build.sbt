@@ -17,7 +17,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %% "akka-stream"                        % akkaV,
     "com.typesafe.akka"   %% "akka-http"                          % akkaHttpV,
     "com.typesafe.akka"   %% "akka-http-spray-json"               % akkaHttpV,
-    "com.typesafe.akka"   %% "akka-http-testkit"                  % akkaHttpV,
+    "com.typesafe.akka"   %% "akka-http-testkit"                  % akkaHttpV % "test",
     "com.typesafe.akka"   %% "akka-slf4j"                         % akkaV,
     "ch.megard"           %% "akka-http-cors"                     % "0.1.5",
     "org.scalactic"       %% "scalactic"                          % scalaTestV,
@@ -41,3 +41,7 @@ parallelExecution in Test := false
 flywayUrl := "jdbc:postgresql:advert"
 
 flywayUser := "advert"
+
+assemblyJarName in assembly := "something.jar"
+
+mainClass in assembly := Some("ah.advert.Main")
