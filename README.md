@@ -69,6 +69,8 @@ return code on success: 200
     
 GET     /advert?sort=price&asc
 
+    curl -X GET -H "Content-Type: application/json" -H "Cache-Control: no-cache" "http://localhost:9000/advert?sort=price&order=asc"
+
 return code on success: 200
 
 GET     /advert/1
