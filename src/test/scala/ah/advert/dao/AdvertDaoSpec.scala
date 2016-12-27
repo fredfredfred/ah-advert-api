@@ -12,7 +12,7 @@ class AdvertDaoSpec extends BaseTest {
 
   it should "create and find adverts" in {
     val count = waitForResult(advertDao.count)
-    val idInserted: Long = waitForResult(advertDao.insert(Advert(1, "title1", Fuel.DIESEL, 10, true, Some(30000), Some(LocalDate.now))))
+    val idInserted: Long = waitForResult(advertDao.insert(Advert(1, "title1", Fuel.DIESEL, 10, true, Some(30000), Some(LocalDate.of(2012,12,12)))))
     idInserted should be(count + 1)
 
     val advert: Option[Advert] = waitForResult(advertDao.findById(idInserted))

@@ -8,6 +8,8 @@ import ah.advert.entity.Advert
 import ah.advert.entity.Fuel._
 import ah.advert.json.JsonProtocol._
 import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.ValidationRejection
+import spray.json.DefaultJsonProtocol.jsonFormat7
 
 class AdvertRoutesSpec extends BaseTestRoutes {
 
@@ -20,7 +22,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   }
 
   it should "create create a new advert" in {
-    val advert1 = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.now))
+    val advert1 = Advert(1, "title1", GASOLINE, 10, true, Some(30000), Some(LocalDate.of(2010,10,10)))
 
     Post(testPath, advert1) ~> advertRoutes.routes ~> check {
       status === StatusCodes.Created
@@ -34,7 +36,7 @@ class AdvertRoutesSpec extends BaseTestRoutes {
   }
 
   it should "update an existing advert" in {
-    val date = LocalDate.now
+    val date = LocalDate.of(2010,10,10)
     val advert1 = Advert(2, "title2", DIESEL, 20, false, Some(30000), Some(date))
 
     var id: String = ""
@@ -157,6 +159,34 @@ class AdvertRoutesSpec extends BaseTestRoutes {
       val adverts = responseAs[Seq[Advert]]
       adverts should not be empty
       (adverts, adverts.tail).zipped.forall(_.price >= _.price) should be(true)
+    }
+  }
+
+  it should "return reject an unknown sort field" in {
+    Get(s"$testPath?sort=pretzel&order=desc") ~> advertRoutes.routes ~>  check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+
+  it should "return reject an unknown order field" in {
+    Get(s"$testPath?sort=id&order=bla") ~> advertRoutes.routes ~>  check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+
+  it should "return reject a negative price" in {
+    case class BrokenAdvert(
+                       id: Long,
+                       title: String,
+                       fuel: Fuel,
+                       price: Int,
+                       `new`: Boolean,
+                       mileage: Option[Int],
+                       firstRegistration: Option[LocalDate])
+    implicit val brokenAdvertFormat = jsonFormat7(BrokenAdvert.apply)
+    val brokenAdvert = BrokenAdvert(1, "title1", GASOLINE, -10, true, Some(30000), Some(LocalDate.of(2010,10,10)))
+    Post(testPath, brokenAdvert) ~> advertRoutes.routes ~> check {
+      rejection shouldBe a [ValidationRejection]
     }
   }
 
