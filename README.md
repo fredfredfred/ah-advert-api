@@ -64,6 +64,12 @@ Make sure port 9000 is not used or configure it in application.conf (http.port).
     PUT     /advert/:id             Updates the advert with the identifier :id if found
                                       or creates a new one and returns the id (like POST)
     DELETE  /advert/:id             Deletes the advert with the identifier :id
+
+## Test on AWS
+A version of the software is deployed for testing on this URL:
+    
+    http://advertlb-946936086.eu-central-1.elb.amazonaws.com/advert
+
 ## Test with curl
 GET     /advert
  
